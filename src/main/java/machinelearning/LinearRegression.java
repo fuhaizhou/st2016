@@ -1,10 +1,10 @@
 package machinelearning;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -13,57 +13,68 @@ public class LinearRegression {
     private static final StandardDeviation standardDeviation = new StandardDeviation();
     private static final Mean mean = new Mean();
 
-    private static final double ALPHA = 0.01;
+    private static final double ALPHA = 0.0001;
 
-    List<Double> scaleFeature(double [] featureVector) {
+    static double [] scaleFeature(double [] featureVector) {
         final double meanVal = mean.evaluate(featureVector);
         final double stdVal = standardDeviation.evaluate(featureVector, meanVal);
-        List<Double> list =  DoubleStream.of(featureVector)
-            .map(x -> (x - meanVal) / stdVal)
-            .boxed()
-            .collect(Collectors.toList());
-        return list;
+        return DoubleStream.of(featureVector)
+            .map(x -> stdVal < 0.00000001 ? x : (x - meanVal) / stdVal)
+            .toArray();
     }
 
-    double descent(int index, double [] T, double [][] M, double [] Y) {
-        if(M.length != Y.length)
-            throw new RuntimeException("Size of the example and the output has to be the same!");
+    static double [][] scaleExamples(double [][] exampleMatrix) {
+        RealMatrix rm = new Array2DRowRealMatrix(exampleMatrix);
+        RealMatrix scaledRM = new Array2DRowRealMatrix(exampleMatrix.length, exampleMatrix[0].length);
+        for(int i = 0; i < exampleMatrix[0].length; i++) {
+            double [] col = rm.getColumn(i);
+            double [] scaledCol = scaleFeature(col);
+            scaledRM.setColumn(i, scaledCol);
+        }
+        return scaledRM.getData();
+    }
 
-        if(M[0].length != T.length)
+    static double descent(int ithDimension, double [] thetaVector, double [][] exampleMatrix, double [] labelVector) {
+        if(exampleMatrix.length != labelVector.length)
+            throw new RuntimeException("Size of the example and the label has to be the same!");
+
+        if(exampleMatrix[0].length != thetaVector.length)
             throw new RuntimeException("Size of the theta vector and the dimension of the output has to be the same!");
 
-        double theta = T[index];
+        double theta = thetaVector[ithDimension];
         double sum = 0;
-        for(int i = 0; i < M.length; i++) {
-            double [] X = M[i]; // ith example
-            double y = Y[i]; // ith actual output
+        for(int i = 0; i < exampleMatrix.length; i++) {
+            double [] ithExampleVector = exampleMatrix[i]; // ith example
+            double ithLabel = labelVector[i]; // ith actual output
 
-            double yHead = IntStream.range(0, X.length)
+            double yHead = IntStream.range(0, ithExampleVector.length)
                 .parallel()
-                .mapToDouble(j -> T[j] * X[j])
+                .mapToDouble(j -> thetaVector[j] * ithExampleVector[j])
                 .sum();
-            sum += (yHead - y) * X[index];
+            sum += (yHead - ithLabel) * ithExampleVector[ithDimension];
         }
-        double avg = sum / M.length;
+        double avg = sum / exampleMatrix.length;
         return theta - ALPHA * avg;
     }
 
-    double [] gradientDescent(double [] T, double [][] M, double [] Y) {
+    public static double [] gradientDescent(double [][] exampleMatrix, double [] labelVector) {
 
+        final double [][] scaledExampleMatrix = scaleExamples(exampleMatrix);
         boolean isConverged = false;
+        double [] thetaVector = new double[exampleMatrix[0].length];
         while(!isConverged) {
-            final double [] t = T;
-            double[] newT = IntStream.range(0, T.length)
+            final double [] finalThetaVectorCopy = thetaVector;
+            double[] newThetaVector = IntStream.range(0, thetaVector.length)
                 .parallel()
-                .mapToDouble(i -> descent(i, t, M, Y))
+                .mapToDouble(i -> descent(i, finalThetaVectorCopy, scaledExampleMatrix, labelVector))
                 .toArray();
-            isConverged = isConverged(T, newT);
-            T = newT;
+            isConverged = isConverged(thetaVector, newThetaVector);
+            thetaVector = newThetaVector;
         }
-        return T;
+        return thetaVector;
     }
 
-    boolean isConverged(double [] T, double [] newT) {
+    static boolean isConverged(double [] T, double [] newT) {
         for(int i = 0; i < T.length; i++) {
             if(Math.abs(newT[i] - T[i]) > ALPHA)
                 return false;
