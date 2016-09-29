@@ -1,4 +1,4 @@
-package machinelearning;
+package machine_learning;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
