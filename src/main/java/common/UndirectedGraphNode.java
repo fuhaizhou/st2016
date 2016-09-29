@@ -9,6 +9,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UndirectedGraphNode {
+
+    private static final String SEPARATOR = "#";
+
     public int label;
     public List<UndirectedGraphNode> neighbors;
 
@@ -18,7 +21,7 @@ public class UndirectedGraphNode {
     }
 
     public static UndirectedGraphNode deSerialize(String graph) {
-        String [] strs = graph.split("#");
+        String [] strs = graph.split(SEPARATOR);
         UndirectedGraphNode root = null;
         Map<String, UndirectedGraphNode> nodeMap = new HashMap<>(strs.length);
         for(String str : strs) {
@@ -65,10 +68,10 @@ public class UndirectedGraphNode {
             .distinct()
             .filter(neighbor -> !visited.contains(neighbor))
             .map(neighbor -> serialize(neighbor, visited))
-            .collect(Collectors.joining("#"));
+            .collect(Collectors.joining(SEPARATOR));
 
         if(!recursiveStr.isEmpty()) {
-            str += "#";
+            str += SEPARATOR;
             str += recursiveStr;
         }
 
