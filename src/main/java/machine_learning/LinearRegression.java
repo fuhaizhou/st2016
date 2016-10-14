@@ -17,7 +17,7 @@ public class LinearRegression {
     private static final Random random = new Random(System.currentTimeMillis());
 
     private static final double ALPHA = 0.00001;
-    private static final double DELTA = 0.01;
+    private static final double DELTA = 0.000001;
 
     static double [] scaleFeature(double [] featureVector) {
         final double meanVal = mean.evaluate(featureVector);
@@ -55,7 +55,7 @@ public class LinearRegression {
         return theta - ALPHA * avg;
     }
 
-    static double hypothesis(double [] thetaVector, double [] exampleVector) {
+    public static double hypothesis(double [] thetaVector, double [] exampleVector) {
         return IntStream.range(0, exampleVector.length)
             .parallel()
             .mapToDouble(i -> thetaVector[i] * exampleVector[i])

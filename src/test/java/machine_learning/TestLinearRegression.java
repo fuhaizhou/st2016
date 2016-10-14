@@ -62,6 +62,34 @@ public class TestLinearRegression {
     }
 
     @Test
+    public void simpleTest() {
+        double [][] exampleMatrix =
+            {{1, 1},
+            {1, 2},
+            {1, 3},
+            {1, 4},
+            {1, 5},
+            {1, 6},
+            {1, 7},
+            {1, 8},
+            {1, 9},
+            {1, 10}};
+        double [] labelVector = {1.5,
+            1.7,
+            3.3,
+            4.4,
+            4.5,
+            5.5,
+            7.1,
+            8.2,
+            9.5,
+            10.6};
+        double [] thetaVector = LinearRegression.gradientDescent(exampleMatrix, labelVector);
+        double yHead = LinearRegression.hypothesis(thetaVector, new double []{1, 11});
+        double cost1 = LinearRegression.costFunction(thetaVector, exampleMatrix, labelVector);
+    }
+
+    @Test
     public void testCostFunction() {
         double [][] exampleMatrix =
             {{1, 3},
