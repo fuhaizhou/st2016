@@ -38,7 +38,7 @@ public class _269_AlienDictionaryTest {
     public void test5() {
         String [] strs = {"za","zb","ca","cb"};
         String s = solution.alienOrder(strs);
-        Assert.assertEquals(s, "zacb");
+        Assert.assertEquals(s, "azbc");
     }
 
     @Test
@@ -52,6 +52,6 @@ public class _269_AlienDictionaryTest {
     public void test7() {
         String [] strs = {"abcdefg"};
         String s = solution.alienOrder(strs);
-        Assert.assertEquals(s, "cabfdeg");
+        Assert.assertEquals(s, "cdfaebg");
     }
 }

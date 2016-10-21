@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * There is a new alien language which uses the latin alphabet. However, the order among letters are unknown to you.
@@ -28,17 +27,13 @@ public class _269_AlienDictionary {
 
     public String alienOrder(String [] words) {
         Map<Character, Node> nodeMap = new HashMap<>();
-        Set<Character> treeNodes = new HashSet<>();
-        Set<Node> zeros = buildTree(words, nodeMap, treeNodes);
+        Set<Node> zeros = buildTree(words, nodeMap);
         if(zeros == null)
             return "";
         String sort = topologySort(zeros);
-        if(sort.length() != treeNodes.size())
+        if(sort.length() != nodeMap.size())
             return "";
-        return sort + nodeMap.keySet().stream()
-            .filter(x -> !treeNodes.contains(x))
-            .map(x -> "" + x)
-            .collect(Collectors.joining(""));
+        return addRestChars(words, nodeMap, sort);
     }
 
     static class Node {
@@ -53,16 +48,33 @@ public class _269_AlienDictionary {
         }
     }
 
-    Set<Node> buildTree(String [] words, Map<Character, Node> nodeMap, Set<Character> treeNodes) {
+    String addRestChars(String [] words, Map<Character, Node> nodeMap, String initStr) {
+        sb.setLength(0);
+        sb.append(initStr);
+        Set<Character> appended = new HashSet<>();
+        for(int i = 0; i < words.length; i++) {
+            for(int j = 0; j < words[i].length(); j++) {
+                char c = words[i].charAt(j);
+                if(!nodeMap.containsKey(c) && !appended.contains(c)) {
+                    sb.append(c);
+                    appended.add(c);
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    Set<Node> buildTree(String [] words, Map<Character, Node> nodeMap) {
         if(words.length == 0)
             return null;
 
         Set<Node> zeros = new HashSet<>();
         if(words.length == 1) {
             for(char c : words[0].toCharArray()) {
-                if(!treeNodes.contains(c)) {
-                    treeNodes.add(c);
-                    zeros.add(new Node(c));
+                if(!nodeMap.containsKey(c)) {
+                    Node node = new Node(c);
+                    nodeMap.put(c, node);
+                    zeros.add(node);
                 }
             }
             return zeros;
@@ -73,39 +85,27 @@ public class _269_AlienDictionary {
             String cur = words[i];
 
             int j = 0;
-            boolean diff = false;
-            while(j < cur.length() || j < prev.length()) {
-                Node prevNode = null;
-                Node curNode = null;
-                if(j < prev.length()) {
-                    char prevChar = prev.charAt(j);
-                    prevNode = nodeMap.get(prevChar);
-                    if(prevNode == null) {
-                        prevNode = new Node(prevChar);
-                        nodeMap.put(prevChar, prevNode);
-                    }
-                }
-                if(j < cur.length()) {
-                    char curChar = cur.charAt(j);
-                    curNode = nodeMap.get(curChar);
-                    if(curNode == null) {
-                        curNode = new Node(curChar);
-                        nodeMap.put(curChar, curNode);
-                    }
-                }
-                if(!diff && prevNode != null && curNode == null)
-                    return null;
-                if(!diff && prevNode != null && curNode != null && prev.charAt(j) != cur.charAt(j)) {
-                    diff = true;
-                    prevNode.successors.add(curNode);
-                    curNode.predecessors.add(prevNode);
-                    if(prevNode.predecessors.size() == 0)
-                        zeros.add(prevNode);
-                    zeros.remove(curNode);
-                    treeNodes.add(prevNode.val);
-                    treeNodes.add(curNode.val);
-                }
+            while(j < prev.length() && j < cur.length() && prev.charAt(j) == cur.charAt(j))
                 j++;
+            if(j < prev.length() && j >= cur.length())
+                return null;
+            if(j < prev.length() && j < cur.length()) {
+                char preChar = prev.charAt(j);
+                char curChar = cur.charAt(j);
+                Node preNode = nodeMap.get(preChar);
+                if(preNode == null) {
+                    preNode = new Node(preChar);
+                    nodeMap.put(preChar, preNode);
+                    zeros.add(preNode);
+                }
+                Node curNode = nodeMap.get(curChar);
+                if(curNode == null) {
+                    curNode = new Node(curChar);
+                    nodeMap.put(curChar, curNode);
+                }
+                preNode.successors.add(curNode);
+                curNode.predecessors.add(preNode);
+                zeros.remove(curNode);
             }
         }
         return zeros;
