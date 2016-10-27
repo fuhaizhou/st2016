@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class TreeNode {
+public class TreeNode<T> {
 
     private static final String NULL = "null";
 
-    public int val;
+    public T val;
     public TreeNode left;
     public TreeNode right;
 
-    public TreeNode(int x) {
+    public TreeNode(T x) {
         val = x;
     }
 
