@@ -1,6 +1,5 @@
 package leetcode;
 
-import leetcode._267_PalindromePermutationII;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,7 +17,7 @@ public class _267_PalindromePermutationIITest {
 
         array = new int[][]{{'1',3}, {'2', 1}};
         permutations = solution.permute(array, -1);
-        Assert.assertEquals(permutations.size(), 120);
+        Assert.assertEquals(permutations.size(), 4);
     }
 
     @Test

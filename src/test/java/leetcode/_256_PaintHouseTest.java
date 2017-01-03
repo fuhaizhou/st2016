@@ -1,6 +1,5 @@
 package leetcode;
 
-import leetcode._256_PaintHouse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

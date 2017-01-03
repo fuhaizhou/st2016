@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 public class TestLogisticRegression {
 
-    @Test
+    @Test (enabled = false)
     public void test1() {
         double [][] exampleMatrix =
             {{1, 2104, 5, 1, 45},
@@ -19,7 +19,7 @@ public class TestLogisticRegression {
         //Assert.assertEquals(thetaVector, new double[]{1.0, 2.0});
     }
 
-    @Test
+    @Test(enabled = false)
     public void test2() {
         double [][] exampleMatrix =
             {{1, 2104, 3},
@@ -58,7 +58,7 @@ public class TestLogisticRegression {
         double cost2 = LinearRegression.costFunction(thetaVectorNE, exampleMatrix, labelVector);
     }
 
-    @Test
+    @Test(enabled = false)
     public void simpleTest() {
         double [][] exampleMatrix =
             {{1, 1},

@@ -103,7 +103,6 @@ public class LogisticRegression {
             if(cost - newCost < DELTA)
                 break;
             cost = newCost;
-            System.out.println(cost);
             thetaVector = newThetaVector;
         }
         return thetaVector;

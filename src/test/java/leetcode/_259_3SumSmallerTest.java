@@ -1,6 +1,5 @@
 package leetcode;
 
-import leetcode._259_3SumSmaller;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
